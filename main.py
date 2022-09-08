@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 from modules import *
 
@@ -41,14 +42,52 @@ class MainWidget(QWidget):
         # 显示应用
         self.show()
 
+    def cmd(self, command):
+        subp = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8")
+        subp.wait(2)
+        if subp.poll() == 0:
+            print(subp.communicate())
+        else:
+            print("失败")
+
     # 按键点击
     def buttonClick(self):
         btn = self.sender()
         btnName = btn.objectName()
 
         if btnName == "btn_ver":
-            os.system("sunxi_tools\sunxi-fel.exe ver")
+            self.cmd("sunxi_tools\sunxi-fel.exe ver")
 
+        if btnName == "btn_list":
+            self.cmd("sunxi_tools\sunxi-fel.exe -l")
+
+        if btnName == "btn_spl":
+            filePath = None
+            self.cmd(f'sunxi_tools\sunxi-fel.exe spl "{filePath}"')
+
+        if btnName == "btn_write":
+            addr = None
+            filePath = None
+            self.cmd(f'sunxi_tools\sunxi-fel.exe write -p "{addr}" "{filePath}"')
+
+        if btnName == "btn_exec":
+            addr = None
+            self.cmd(f'sunxi_tools\sunxi-fel.exe exec "{addr}"')
+
+        if btnName == "btn_spiflash_info":
+            self.cmd("sunxi_tools\sunxi-fel.exe spiflash-info")
+
+        if btnName == "btn_spiflash_read":
+            addr = None
+            slen = None
+            filePath = None
+            self.cmd(f'sunxi_tools\sunxi-fel.exe spiflash-read "{addr}" "{slen}" "{filePath}"')
+
+        if btnName == "btn_spiflash_write":
+            addr = None
+            slen = None
+            filePath = None
+            self.cmd(f'sunxi_tools\sunxi-fel.exe spiflash-write "{addr}" "{slen}" "{filePath}"')
 
         print(f'Button "{btnName}" pressed!')
 
